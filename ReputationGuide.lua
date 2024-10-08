@@ -27,6 +27,8 @@ REP_FactionGain = {}
 ---- Tracking data
 REP_Entries = {}
 
+local IsFactionParagon = C_Reputation.IsFactionParagon or nop
+
 ------------------------
 -- _01_ Addon Startup --
 ------------------------
@@ -161,7 +163,7 @@ function REP_OnLoad(self)
     
       local isParagon
       if REP.AfterMoP then
-        if (factionID and C_Reputation.IsFactionParagon(factionID)) then
+        if (factionID and IsFactionParagon(factionID)) then
           isParagon = true
     
           local currentValue, threshold, rewardQuestID, hasRewardPending = C_Reputation.GetFactionParagonInfo(factionID)
@@ -191,7 +193,7 @@ function REP_OnLoad(self)
       end
     
       -- Set reputation bar to paragon values if user option is activated and faction is at paragon rep
-      if(factionID and C_Reputation.IsFactionParagon(factionID) and REP_Data.Global.ShowParagonBar) then
+      if(factionID and IsFactionParagon(factionID) and REP_Data.Global.ShowParagonBar) then
         local currentValue, threshold, rewardQuestID, hasRewardPending = C_Reputation.GetFactionParagonInfo(factionID)
         barMin, barMax, barValue = 0, threshold, mod(currentValue, threshold)
       end
@@ -201,7 +203,7 @@ function REP_OnLoad(self)
       barValue = barValue - barMin
       barMin = 0
     
-      if(factionID and C_Reputation.IsFactionParagon(factionID) and REP_Data.Global.ShowParagonBar and REP_Data.Global.ShowMissing ~= true) then
+      if(factionID and IsFactionParagon(factionID) and REP_Data.Global.ShowParagonBar and REP_Data.Global.ShowMissing ~= true) then
         factionRow.rolloverText = HIGHLIGHT_FONT_COLOR_CODE.." "..format(REPUTATION_PROGRESS_FORMAT, barValue, barMax)..FONT_COLOR_CODE_CLOSE
       elseif(isCapped or isCappedFriendship) then
         factionRow.rolloverText = nil
@@ -222,7 +224,7 @@ function REP_OnLoad(self)
       end
     
       if (REP_Data.Global.ShowMissing) then
-        if ((barMax - barValue) ~= 0 and factionID and C_Reputation.IsFactionParagon(factionID) and REP_Data.Global.ShowParagonBar) then
+        if ((barMax - barValue) ~= 0 and factionID and IsFactionParagon(factionID) and REP_Data.Global.ShowParagonBar) then
           factionRow.standingText = "Paragon".." ("..barMax - barValue..")"
         elseif ((barMax - barValue) ~= 0) then
           if factionStandingtext then
@@ -234,7 +236,7 @@ function REP_OnLoad(self)
           factionRow.standingText = factionStandingtext
         end
       else
-        if(factionID and C_Reputation.IsFactionParagon(factionID) and REP_Data.Global.ShowParagonBar) then
+        if(factionID and IsFactionParagon(factionID) and REP_Data.Global.ShowParagonBar) then
           factionRow.standingText = "Paragon"
         else
           factionRow.standingText = factionStandingtext
@@ -2616,7 +2618,7 @@ function REP_BuildUpdateList(selectedIndex)
       end
     end
 
-    if(factionID and C_Reputation.IsFactionParagon(factionID)) then
+    if(factionID and IsFactionParagon(factionID)) then
       local currentValue, threshold, rewardQuestID, hasRewardPending = C_Reputation.GetFactionParagonInfo(factionID)
       barMin, barMax, barValue = 0, threshold, mod(currentValue, threshold)
     end
@@ -3604,7 +3606,7 @@ function REP:DumpReputationChangesToChat(initOnly)
       end
 
       if REP.AfterWoD then
-        if(factionID and C_Reputation.IsFactionParagon(factionID)) then
+        if(factionID and IsFactionParagon(factionID)) then
           local currentValue, threshold = C_Reputation.GetFactionParagonInfo(factionID)
           barMin, barMax, barValue = 0, threshold, mod(currentValue, threshold)
         end
@@ -4137,13 +4139,13 @@ function REP:StandingSort()
 
     if (not REP_ProfileKey or not REP_Data[REP_ProfileKey].InactiveFactions[factionID]) then
       if (REP.AfterWoD) then
-        if(factionID and C_Reputation.IsFactionParagon(factionID) and REP_Data.Global.ShowParagonBar) then
+        if(factionID and IsFactionParagon(factionID) and REP_Data.Global.ShowParagonBar) then
           local currentValue, threshold, _, _ = C_Reputation.GetFactionParagonInfo(factionID)
           barMax, barValue, standingID = threshold, mod(currentValue, threshold), 9
         end
 
         -- if isFriend then -- Fix reputations with only 6 reputation levels
-        --   if (standingID == 6) and (not C_Reputation.IsFactionParagon(factionID)) then
+        --   if (standingID == 6) and (not IsFactionParagon(factionID)) then
         --     standingID = standingID + 2
         --   else
         --     standingID = standingID + 3
@@ -4363,7 +4365,7 @@ function REP_GetReputationGains(factionID, factionIndex)
   else
     local isParagon = false
     if REP.AfterMoP then
-      if (factionID and C_Reputation.IsFactionParagon(factionID)) then
+      if (factionID and IsFactionParagon(factionID)) then
         isParagon = true
       end
     end
@@ -4670,7 +4672,7 @@ function REP:Rep_Detail_Frame()
 
   local isParagon = false
   if REP.AfterMoP then
-    if (factionID and C_Reputation.IsFactionParagon(factionID)) then
+    if (factionID and IsFactionParagon(factionID)) then
       isParagon = true
     end
   end
@@ -5427,7 +5429,7 @@ function REP:SortByStandingWithoutFactionHeader(i, factionIndex, factionRow, fac
     barMin = 0
 
     if REP.AfterWoD then
-      if (factionID and C_Reputation.IsFactionParagon(factionID)) then
+      if (factionID and IsFactionParagon(factionID)) then
         isParagon = true
   
         local paragonFrame = ReputationFrame.paragonFramesPool:Acquire()
@@ -5452,7 +5454,7 @@ function REP:SortByStandingWithoutFactionHeader(i, factionIndex, factionRow, fac
       end
     end
 
-    if(factionID and C_Reputation.IsFactionParagon(factionID) and REP_Data.Global.ShowParagonBar and REP_Data.Global.ShowMissing ~= true) then
+    if(factionID and IsFactionParagon(factionID) and REP_Data.Global.ShowParagonBar and REP_Data.Global.ShowMissing ~= true) then
       factionRow.rolloverText = HIGHLIGHT_FONT_COLOR_CODE.." "..format(REPUTATION_PROGRESS_FORMAT, barValue, barMax)..FONT_COLOR_CODE_CLOSE
     elseif(isCapped or isCappedFriendship) then
       factionRow.rolloverText = nil
@@ -5475,7 +5477,7 @@ function REP:SortByStandingWithoutFactionHeader(i, factionIndex, factionRow, fac
     factionRow.index = OBS_fi_i
 
     if (REP_Data.Global.ShowMissing) then
-      if ((barMax - barValue) ~= 0 and factionID and C_Reputation.IsFactionParagon(factionID) and REP_Data.Global.ShowParagonBar) then
+      if ((barMax - barValue) ~= 0 and factionID and IsFactionParagon(factionID) and REP_Data.Global.ShowParagonBar) then
         factionRow.standingText = tostring(REP_TXT.STAND_LV[9]).." ("..barMax - barValue..")"
       elseif ((barMax - barValue) ~= 0) then
         if(factionStandingtext) then
@@ -5487,7 +5489,7 @@ function REP:SortByStandingWithoutFactionHeader(i, factionIndex, factionRow, fac
         factionRow.standingText = factionStandingtext
       end
     else
-      if(factionID and C_Reputation.IsFactionParagon(factionID) and REP_Data.Global.ShowParagonBar) then
+      if(factionID and IsFactionParagon(factionID) and REP_Data.Global.ShowParagonBar) then
         factionRow.standingText = tostring(REP_TXT.STAND_LV[9])
       else
         factionRow.standingText = factionStandingtext
@@ -5628,7 +5630,7 @@ function REP:OriginalRepOrderWithoutFactionHeader(i, factionIndex, factionRow, f
   local origBarValue = barValue
 
   if REP.AfterWoD then
-    if (factionID and C_Reputation.IsFactionParagon(factionID)) then
+    if (factionID and IsFactionParagon(factionID)) then
       isParagon = true
 
       local currentValue, threshold, rewardQuestID, hasRewardPending = C_Reputation.GetFactionParagonInfo(factionID)
@@ -5658,7 +5660,7 @@ function REP:OriginalRepOrderWithoutFactionHeader(i, factionIndex, factionRow, f
   end
 
   -- Set reputation bar to paragon values if user option is activated and faction is at paragon rep
-  if(factionID and C_Reputation.IsFactionParagon(factionID) and REP_Data.Global.ShowParagonBar) then
+  if(factionID and IsFactionParagon(factionID) and REP_Data.Global.ShowParagonBar) then
     local currentValue, threshold, rewardQuestID, hasRewardPending = C_Reputation.GetFactionParagonInfo(factionID)
     barMin, barMax, barValue = 0, threshold, mod(currentValue, threshold)
   end
@@ -5668,7 +5670,7 @@ function REP:OriginalRepOrderWithoutFactionHeader(i, factionIndex, factionRow, f
   barValue = barValue - barMin
   barMin = 0
 
-  if(factionID and C_Reputation.IsFactionParagon(factionID) and REP_Data.Global.ShowParagonBar and REP_Data.Global.ShowMissing ~= true) then
+  if(factionID and IsFactionParagon(factionID) and REP_Data.Global.ShowParagonBar and REP_Data.Global.ShowMissing ~= true) then
     factionRow.rolloverText = HIGHLIGHT_FONT_COLOR_CODE.." "..format(REPUTATION_PROGRESS_FORMAT, barValue, barMax)..FONT_COLOR_CODE_CLOSE
   elseif(isCapped or isCappedFriendship) then
     factionRow.rolloverText = nil
@@ -5689,7 +5691,7 @@ function REP:OriginalRepOrderWithoutFactionHeader(i, factionIndex, factionRow, f
   end
 
   if (REP_Data.Global.ShowMissing) then
-    if ((barMax - barValue) ~= 0 and factionID and C_Reputation.IsFactionParagon(factionID) and REP_Data.Global.ShowParagonBar) then
+    if ((barMax - barValue) ~= 0 and factionID and IsFactionParagon(factionID) and REP_Data.Global.ShowParagonBar) then
       factionRow.standingText = "Paragon".." ("..barMax - barValue..")"
     elseif ((barMax - barValue) ~= 0) then
       if factionStandingtext then
@@ -5701,7 +5703,7 @@ function REP:OriginalRepOrderWithoutFactionHeader(i, factionIndex, factionRow, f
       factionRow.standingText = factionStandingtext
     end
   else
-    if(factionID and C_Reputation.IsFactionParagon(factionID) and REP_Data.Global.ShowParagonBar) then
+    if(factionID and IsFactionParagon(factionID) and REP_Data.Global.ShowParagonBar) then
       factionRow.standingText = "Paragon"
     else
       factionRow.standingText = factionStandingtext
@@ -6101,7 +6103,7 @@ function REP:WatchedFactionDetails(watchedFactionID)
       repValue = barValue
       repMax = barMax
       origBarValue = barValue
-      isRepParagon = C_Reputation.IsFactionParagon(factionID)
+      isRepParagon = IsFactionParagon(factionID)
       isRepFriend = isFriend
       isRepCappedFriendship = isCappedFriendship
       repFactionStandingtext = factionStandingtext
